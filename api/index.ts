@@ -423,6 +423,8 @@ router.post("/admin/invite", requireAdminAuth, async (req: any, res: any) => {
     if (resend) {
       try {
         const fromAddress = defaultFromEmail;
+        const appBaseUrl = (req.headers.origin as string) || process.env.VITE_SITE_URL || "https://www.rcvitc.in";
+        const adminUrl = `${appBaseUrl.replace(/\/+$/, "")}/#admin`;
         const { data: mailData, error: mailError } = await resend.emails.send({
           from: fromAddress,
           to: [cleanEmail],
@@ -441,7 +443,7 @@ router.post("/admin/invite", requireAdminAuth, async (req: any, res: any) => {
               </div>
               <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5;">You can now log into the club website using your Google <code>@vitstudent.ac.in</code> account to access the Admin Terminal.</p>
               <div style="margin-top: 24px;">
-                <a href="https://rc-web-rho.vercel.app/#admin" style="background-color: #e8b828; color: #101010; font-weight: bold; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block; font-size: 13px;">
+                <a href="${adminUrl}" style="background-color: #e8b828; color: #101010; font-weight: bold; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block; font-size: 13px;">
                   Open Admin Terminal
                 </a>
               </div>
