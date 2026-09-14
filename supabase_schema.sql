@@ -101,6 +101,22 @@ CREATE TABLE IF NOT EXISTS public.collaborations (
 );
 
 -- ==============================================================================
+-- 6. TABLE: form_submissions (For recruitments, registrations, and contact)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.form_submissions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    form_type TEXT DEFAULT 'recruitment',
+    full_name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    roll_number TEXT,
+    department_preference TEXT,
+    message TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ==============================================================================
 -- 7. TABLE: admins (For dynamic admin access delegation)
 -- ==============================================================================
 CREATE TABLE IF NOT EXISTS public.admins (

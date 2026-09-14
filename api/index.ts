@@ -7,13 +7,15 @@ const app = express();
 app.use(express.json());
 
 // Initialize Supabase Client with resilient fallbacks
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+const rawSupabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+const supabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 // Initialize Resend Client
 const resendApiKey = process.env.RESEND_API_KEY || "";
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const defaultFromEmail = process.env.RESEND_FROM_EMAIL || "VITC Robotics Club <contact@rcvitc.in>";
 
 // Initialize ImageKit Client
 const ikPublicKey = process.env.IMAGEKIT_PUBLIC_KEY || process.env.VITE_IMAGEKIT_PUBLIC_KEY || "";
@@ -322,7 +324,7 @@ router.post("/admin/request-access", requireAuth, async (req: any, res: any) => 
   if (resend) {
     try {
       await resend.emails.send({
-        from: "VITC Robotics Club <onboarding@resend.dev>",
+        from: defaultFromEmail,
         to: ["rifanajmal@gmail.com", "robotics.club@vit.ac.in"],
         subject: `🔒 Admin Access Request: ${user.email}`,
         html: `
@@ -420,7 +422,7 @@ router.post("/admin/invite", requireAdminAuth, async (req: any, res: any) => {
     let emailErrorMessage = "";
     if (resend) {
       try {
-        const fromAddress = process.env.RESEND_FROM_EMAIL || "VITC Robotics Club <onboarding@resend.dev>";
+        const fromAddress = defaultFromEmail;
         const { data: mailData, error: mailError } = await resend.emails.send({
           from: fromAddress,
           to: [cleanEmail],
@@ -590,7 +592,7 @@ router.post("/email/send-otp", async (req, res) => {
   if (resend) {
     try {
       const { data, error } = await resend.emails.send({
-        from: "VITC Robotics Club <onboarding@resend.dev>",
+        from: defaultFromEmail,
         to: [targetEmail],
         subject: `🔐 Certificate Verification Code: ${verificationCode}`,
         html: `
